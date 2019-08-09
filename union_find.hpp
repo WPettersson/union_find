@@ -35,19 +35,24 @@ const UnionFindElement<T> * UnionFind<T>::find_parent(T element) {
 
 template<typename T>
 void UnionFind<T>::add_element(T element) {
-  auto pair = _elements.emplace(std::piecewise_construct,
-                                std::forward_as_tuple(element),
-                                std::forward_as_tuple(element));
+  _elements.emplace(std::piecewise_construct,
+                    std::forward_as_tuple(element),
+                    std::forward_as_tuple(element));
 }
 
 template<typename T>
 void UnionFind<T>::add_element(T element, T similar_to) {
   auto found = _elements.find(similar_to);
-  if (found != _elements.end()) {
-    auto pair = _elements.emplace(std::piecewise_construct,
-                                  std::forward_as_tuple(element),
-                                  std::forward_as_tuple(element, &(found->second)));
+  auto parent = found->second;
+  // If similar_to is not yet here, add it!.
+  if (found == _elements.end()) {
+     parent = _elements.emplace(std::piecewise_construct,
+                              std::forward_as_tuple(similar_to),
+                              std::forward_as_tuple(similar_to));
   }
+  _elements.emplace(std::piecewise_construct,
+                    std::forward_as_tuple(element),
+                    std::forward_as_tuple(element, &parent));
 }
 
 template<typename T>
